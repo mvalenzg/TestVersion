@@ -1,5 +1,10 @@
-name: Build and Release
-on: [push]
+name: .NET CI
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
 
 jobs:
   build:
@@ -7,28 +12,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-      
+          fetch-depth: 0 # OJO: Si es 1, GitVersion no puede calcular la versión
+
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v1
         with:
           versionSpec: '5.x'
 
-      - name: Determine version
+      - name: Determine Version
         id: gitversion
         uses: gittools/actions/gitversion/execute@v1
-      
-      - name: Setup .Net
+
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
-      
-      - name: Build with dotnet
-        run: dotnet build src/Api/Api.csproj /p:Version=${{ steps.gitversion.outputs.semVer }}
+          dotnet-version: '8.0.x'
 
-      - name: Create Release (solo en main/master)
-        if: github.ref == 'refs/heads/main'
-        uses: softprops/actions-gh-release@v1
-        with:
-          tag_name: v${{ steps.gitversion.outputs.semVer }}
-          generate_release_notes: true
+      # Aquí usamos la salida del JSON que acabas de ver en tu terminal
+      - name: Build
+        run: dotnet build /p:Version=${{ steps.gitversion.outputs.SemVer }}
+
+      - name: Test
+        run: dotnet test --no-build
