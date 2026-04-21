@@ -17,5 +17,11 @@ branches:
     mode: ContinuousDelivery
     tag: useBranchName
     increment: Inherit
+  release:
+    regex: ^release(s)?[/-]
+    mode: ContinuousDelivery
+    tag: rc # Esto generará 1.1.0-rc.1, 1.1.0-rc.2, etc.
+    increment: None # La versión la dicta el nombre de la rama (ej: release/1.1.0)
+    prevent-tag-on-merge: false
 ignore:
   sha: []
