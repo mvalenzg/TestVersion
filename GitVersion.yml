@@ -13,7 +13,7 @@ branches:
     tag: beta
     increment: Minor
   feature:
-    regex: ^features?[/-]
+    regex: ^feat(ures)?[/-]
     mode: ContinuousDelivery
     tag: useBranchName
     increment: Inherit
