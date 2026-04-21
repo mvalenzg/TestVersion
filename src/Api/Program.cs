@@ -46,6 +46,21 @@ app.MapGet("/users", () =>
 .WithName("GetAllUSers")
 .WithTags("Users");
 
+app.MapGet("/users/id", (int id) =>
+{
+    return
+        new
+        {
+            id = id,
+            name = $"User {id}",
+            email = $"user{id}@company.com"
+        };
+        
+    
+})
+.WithName("GetUSerById")
+.WithTags("Users");
+
 
 app.MapGet("/version", () =>
 {
