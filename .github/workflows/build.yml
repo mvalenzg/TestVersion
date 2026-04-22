@@ -1,0 +1,48 @@
+name: User CRUD Release Pipeline
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # IMPORTANTE para GitVersion
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v1
+        with:
+          versionSpec: '5.x'
+
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v1
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build WebApi
+        run: dotnet build --configuration Release /p:Version=${{ steps.gitversion.outputs.SemVer }}
+
+      # Este paso crea el Tag y el Release en GitHub automáticamente
+      - name: Create GitHub Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.gitversion.outputs.SemVer }}
+          name: Release v${{ steps.gitversion.outputs.SemVer }}
+          generate_release_notes: true # ¡Usa tus Conventional Commits para escribir las notas!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
