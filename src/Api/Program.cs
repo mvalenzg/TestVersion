@@ -26,10 +26,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+app.MapPost("/users", async (string name) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    await Task.Delay(1000);
+    var id = new Random().Next(1, 100);
+    return Results.Created($"/users/id",
+        new
+        {
+            id = id,
+            name = name,
+            email = $"{name}{id}@company.com"
+        });
+})
+.WithName("CreateUser")
+.WithTags("Users");
+
 
 app.MapGet("/users", () =>
 {
